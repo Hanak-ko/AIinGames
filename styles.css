@@ -1,0 +1,301 @@
+/* styles.css — ОНОВЛЕНИЙ */
+* {margin:0; padding:0; box-sizing:border-box;}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #f0e6ff; 
+    line-height: 1.8;
+    min-height: 100vh;
+    background: #0d001a; 
+    overflow-x: hidden;
+}
+
+:root {
+    --primary: #8a2be2;
+    --accent: #483d8b;
+    --line-width: 4px;
+}
+
+/* === ФОН === */
+body::before {
+    content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(138,43,226,0.1), transparent 80%), #05050a;
+}
+body::after {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* === HEADER === */
+header {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(5, 5, 10, 0.95); backdrop-filter: blur(10px);
+    z-index: 1000; padding: 1.2rem 0; border-bottom: 1px solid rgba(138,43,226,0.2);
+}
+nav {
+    max-width: 1400px; margin: 0 auto; display: flex;
+    justify-content: space-between; align-items: center; padding: 0 2rem;
+}
+.logo {
+    font-size: 2rem; font-weight: 900; letter-spacing: 2px;
+    color: #fff; text-decoration: none; text-shadow: 0 0 10px var(--primary);
+}
+.nav-links a {
+    color: #aaa; text-decoration: none; margin: 0 1.2rem; font-weight: 500; transition: 0.3s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--primary); }
+
+main { padding-top: 120px; }
+
+/* === ВИПРАВЛЕННЯ ЦЕНТРУВАННЯ ТЕКСТУ === */
+h1 {
+    font-size: 4rem; font-weight: 900; text-align: center; margin: 2rem 0 1rem;
+    color: #fff; text-shadow: 0 0 20px var(--primary);
+    min-height: 1.2em; white-space: pre-wrap;
+}
+
+/* Цей клас тепер гарантовано центрує підзаголовки */
+.hero-subtitle, .hero-text-box p {
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;  /* Центрування блоку */
+    margin-right: auto; /* Центрування блоку */
+    color: #ccc;
+    font-size: 1.4rem;
+    line-height: 1.6;
+}
+
+/* === СТИЛІ ДЛЯ НОВОЇ ЛАБОРАТОРІЇ (GRID PATHFINDING) === */
+.grid-container {
+    display: grid;
+    /* Створюємо сітку 10x10 */
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 5px;
+    max-width: 500px;
+    margin: 2rem auto;
+    background: rgba(20, 20, 30, 0.5);
+    padding: 10px;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(138,43,226, 0.2);
+}
+
+.grid-cell {
+    aspect-ratio: 1; /* Квадратні клітинки */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.grid-cell:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* Стани клітинок */
+.grid-cell.wall { background: #444; border-color: #666; animation: popIn 0.2s; }
+.grid-cell.start { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+.grid-cell.end { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+.grid-cell.path { background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: glowPath 0.5s forwards; }
+
+@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+@keyframes glowPath { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+.controls-panel {
+    text-align: center; margin-bottom: 2rem;
+}
+.lab-btn {
+    padding: 1rem 2rem; background: var(--primary); color: #fff; border: none; 
+    border-radius: 30px; font-weight: bold; cursor: pointer; margin: 0 10px;
+    transition: 0.3s; box-shadow: 0 0 10px rgba(138,43,226, 0.4);
+}
+.lab-btn.clear { background: transparent; border: 2px solid var(--primary); }
+.lab-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--primary); }
+
+
+/* === ТАЙМЛАЙН (ЗБЕРЕЖЕНО) === */
+.timeline-container { position: relative; max-width: 1200px; margin: 0 auto; padding: 2rem 0 8rem; }
+.timeline-path { position: absolute; width: var(--line-width); background: linear-gradient(to bottom, transparent, var(--primary) 20%, var(--primary) 80%, transparent); top: 0; bottom: 0; left: 50%; transform: translateX(-50%); box-shadow: 0 0 15px var(--primary); z-index: 0; }
+.timeline-item { position: relative; width: 50%; padding: 20px 120px; z-index: 1; margin-bottom: 100px; }
+.timeline-item.left { left: 0; text-align: right; }
+.timeline-item.right { left: 50%; text-align: left; }
+.timeline-item::before { content: attr(data-year); position: absolute; top: 50%; transform: translateY(-50%); font-size: 8rem; font-weight: 900; color: transparent; -webkit-text-stroke: 2px rgba(138, 43, 226, 0.15); z-index: 0; font-family: 'Segoe UI', sans-serif; pointer-events: none; transition: all 0.5s ease; }
+.timeline-item.left::before { left: 110%; text-align: left; }
+.timeline-item.right::before { right: 110%; text-align: right; }
+.timeline-item.active::before { -webkit-text-stroke: 2px rgba(138, 43, 226, 0.5); text-shadow: 0 0 30px rgba(138, 43, 226, 0.3); opacity: 1; }
+.card::before { content: ''; position: absolute; top: 50%; width: 0; height: 3px; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s; }
+.timeline-item.left .card::before { right: -120px; transform-origin: right; }
+.timeline-item.right .card::before { left: -120px; transform-origin: left; }
+.timeline-item.active .card::before { width: 120px; }
+.timeline-item::after { content: ''; position: absolute; width: 20px; height: 20px; background: #000; border: 3px solid var(--primary); border-radius: 50%; top: 50%; transform: translateY(-50%); z-index: 2; box-shadow: 0 0 10px var(--primary); transition: all 0.3s ease; }
+.timeline-item.left::after { right: -10px; } 
+.timeline-item.right::after { left: -10px; }
+.timeline-item.active::after { background: var(--primary); box-shadow: 0 0 25px #fff; transform: translateY(-50%) scale(1.2); }
+.card { background: rgba(20, 20, 30, 0.7); border: 1px solid rgba(138,43,226, 0.3); border-radius: 15px; padding: 2.5rem; width: 100%; position: relative; backdrop-filter: blur(10px); opacity: 0; transform: scale(0.9); filter: grayscale(100%); transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease, box-shadow 0.6s ease 0.4s, border-color 0.6s ease 0.4s; }
+.timeline-item.active .card { opacity: 1; transform: scale(1); filter: grayscale(0%); border-color: #fff; box-shadow: 0 0 40px rgba(138,43,226, 0.3); }
+.card h3 { font-size: 2rem; color: #fff; margin-bottom: 1rem; }
+.card p { color: #ccc; font-size: 1.1rem; }
+.card img { width: 100%; border-radius: 8px; margin: 1rem 0; border: 1px solid rgba(138,43,226,0.3); }
+.timeline-end-wrapper { display: flex; justify-content: center; margin-top: 6rem; padding: 0 2rem; }
+.timeline-final-card { max-width: 800px; width: 100%; text-align: center; background: rgba(20, 10, 30, 0.95); border: 2px solid var(--primary); opacity: 1; transform: none; filter: none; padding: 3rem; box-shadow: 0 0 60px rgba(138,43,226, 0.2); border-radius: 30px; display: flex; justify-content: center; align-items: center; }
+.cta-button { display: inline-block; padding: 1.5rem 5rem; background: var(--primary); color: #fff; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; border-radius: 60px; box-shadow: 0 0 40px rgba(138,43,226, 0.6); transition: all 0.3s ease; border: 3px solid transparent; }
+.cta-button:hover { background: #fff; color: var(--primary); box-shadow: 0 0 80px #fff; transform: scale(1.1); border-color: var(--primary); }
+
+/* GRID PAGES STYLES (Tech, Ethics) */
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 3rem; max-width: 1400px; margin: 4rem auto; padding: 0 2rem; }
+.tech-card, .error-card { background: rgba(20, 20, 30, 0.6); border: 1px solid rgba(138, 43, 226, 0.2); border-radius: 20px; padding: 2.5rem; position: relative; backdrop-filter: blur(10px); transition: all 0.4s ease; display: flex; flex-direction: column; justify-content: space-between; }
+.tech-card:hover, .error-card:hover { transform: translateY(-10px); border-color: var(--primary); background: rgba(138, 43, 226, 0.15); box-shadow: 0 10px 40px rgba(138, 43, 226, 0.3); }
+.tech-card .icon-box { font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 10px var(--primary)); }
+.tech-card h2 { font-size: 2rem; color: #fff; margin-bottom: 0.2rem; }
+.tech-card .tech-sub { color: var(--primary); font-size: 0.9rem; text-transform: uppercase; font-weight: bold; margin-bottom: 1.5rem; }
+.tech-card .divider { width: 50px; height: 3px; background: var(--primary); margin-bottom: 1.5rem; box-shadow: 0 0 10px var(--primary); }
+.tech-card p, .error-card p { color: #ccc; font-size: 1.1rem; }
+.tech-btn { display: inline-block; padding: 0.8rem 1.5rem; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; transition: all 0.3s ease; align-self: flex-start; }
+.tech-card:hover .tech-btn { border-color: #fff; color: #fff; background: rgba(138,43,226, 0.2); box-shadow: 0 0 20px var(--primary); }
+
+/* Error Card Specifics */
+.error-card { border-left: 4px solid #ff4444; }
+.error-card::before { content: 'WARNING'; position: absolute; top: 10px; right: 10px; font-size: 0.8rem; color: #ff4444; border: 1px solid #ff4444; padding: 2px 5px; opacity: 0.7; }
+.error-card h2 span { color: #ff4444; margin-right: 10px; }
+
+/* FOOTER */
+footer { background: #020205; padding: 4rem 2rem; text-align: center; border-top: 1px solid #1a1a2e; margin-top: 6rem; }
+.author-box { border: 2px dashed var(--primary); padding: 2rem; max-width: 700px; width: 100%; margin: 0 auto; border-radius: 20px; background: rgba(138,43,226, 0.05); }
+.author-box input { background: none; border: none; color: var(--primary); text-align: center; font-size: 1.8rem; width: 100%; outline: none; margin-top: 1rem; }
+.author-box input.glow { text-shadow: 0 0 15px var(--primary); }
+
+@media (max-width: 768px) {
+    .timeline-path { left: 20px; }
+    .timeline-item { width: 100%; padding: 20px 0 40px 60px; }
+    .timeline-item.left, .timeline-item.right { text-align: left; }
+    .timeline-item.left .card::before, .timeline-item.right .card::before { width: 40px; left: -40px; right: auto; }
+    .timeline-item.active .card::before { width: 40px; }
+    .timeline-item::after { left: 10px; right: auto; }
+    .timeline-item::before { display: none; }
+    .cta-button { padding: 1.2rem 2rem; font-size: 1.1rem; width: 100%; }
+    .tech-grid { grid-template-columns: 1fr; }
+}
+/* ... (весь попередній CSS залишається) ... */
+
+/* === ДОДАТКОВІ СТИЛІ ДЛЯ ЛАБОРАТОРІЇ === */
+
+/* Стилі для кнопок в лабораторії */
+.lab-btn {
+    padding: 1rem 2.5rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px;
+    box-shadow: 0 0 15px rgba(138,43,226, 0.4);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lab-btn:hover {
+    transform: scale(1.05);
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 0 30px #fff;
+}
+
+.lab-btn.clear {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    box-shadow: none;
+}
+
+.lab-btn.clear:hover {
+    background: rgba(138,43,226, 0.2);
+    border-color: #fff;
+    color: #fff;
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .grid-container {
+        gap: 2px; /* Менші щілини на телефоні */
+    }
+    .grid-cell {
+        border-radius: 2px;
+    }
+    .vision-area {
+        height: 300px; /* Менша висота */
+    }
+    .vision-cone {
+        width: 250px; height: 250px; /* Менший радіус огляду */
+    }
+}
+
+/* === ВИПРАВЛЕННЯ ДЛЯ СТОРІНКИ ДЖЕРЕЛ === */
+
+/* Робимо картку видимою примусово, ігноруючи анімацію появи */
+.card.visible-card {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    text-align: left;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Заголовки всередині джерел */
+.source-card h3 {
+    text-align: left;
+    color: #fff;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--primary);
+}
+.source-card h3:first-child { margin-top: 0; }
+
+/* Список джерел */
+.sources-list {
+    list-style: none;
+    padding: 0;
+}
+
+.source-item {
+    margin-bottom: 2rem;
+}
+
+/* Посилання (назва статті) */
+.source-link {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    transition: 0.3s;
+}
+
+.source-link:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--primary);
+    transform: translateX(10px);
+}
+
+/* Назва (якщо це не посилання) */
+.source-title {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+/* Опис */
+.source-desc {
+    font-size: 1.1rem;
+    color: #ccc;
+    line-height: 1.6;
+    margin: 0;
+}

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторія ШІ</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* === ОНОВЛЕНИЙ СТИЛЬ ЛАБОРАТОРІЇ (TECH STYLE) === */
+        
+        .lab-section {
+            max-width: 1000px; margin: 0 auto 6rem; padding: 2rem;
+            /* Темний, непрозорий фон як в терміналі */
+            background: #050508; 
+            border: 1px solid var(--primary);
+            /* Ефект "світіння" рамки */
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.1), inset 0 0 50px rgba(138, 43, 226, 0.05);
+            border-radius: 10px; /* Менш круглі кути */
+            position: relative;
+        }
+
+        /* Декоративний заголовок блоку */
+        .lab-section::before {
+            content: 'SIMULATION_MODULE';
+            position: absolute; top: -12px; left: 20px;
+            background: #050508; padding: 0 10px;
+            color: var(--primary); font-family: monospace; letter-spacing: 2px;
+            border: 1px solid var(--primary); border-radius: 5px;
+        }
+
+        .lab-title { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; color: #fff; text-shadow: 0 0 10px var(--primary); }
+        .lab-desc { text-align: center; margin-bottom: 2rem; color: #aaa; font-size: 1.1rem; font-family: monospace; }
+
+        /* --- 1. PATHFINDING --- */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px;
+            width: 100%; max-width: 500px; aspect-ratio: 1; margin: 0 auto 2rem;
+            border: 2px solid #333; /* Рамка для сітки */
+        }
+        .grid-cell {
+            background: rgba(255, 255, 255, 0.05); border-radius: 2px; 
+            cursor: pointer; transition: 0.1s; position: relative;
+        }
+        .grid-cell:hover { background: rgba(255,255,255,0.2); }
+        .grid-cell.wall { background: #444; border: 1px solid #666; }
+        .grid-cell.path { 
+            background: var(--primary); 
+            box-shadow: 0 0 10px var(--primary); 
+            animation: pathPop 0.2s ease-out forwards;
+        }
+        .grid-cell.start { background: #0f0; box-shadow: 0 0 10px #0f0; z-index: 5; }
+        .grid-cell.end { background: #f00; box-shadow: 0 0 10px #f00; z-index: 5; }
+        @keyframes pathPop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+
+        /* --- 2. STEALTH --- */
+        .vision-area {
+            width: 100%; height: 400px; background: #000;
+            border: 2px solid #333; border-radius: 10px; position: relative;
+            overflow: hidden; cursor: crosshair;
+        }
+        .guard-wrapper {
+            position: absolute; top: 50%; left: 50%;
+            width: 0; height: 0; z-index: 2;
+            transition: transform 0.1s linear; 
+        }
+        .guard-body {
+            position: absolute; top: 0; left: 0;
+            width: 40px; height: 40px; 
+            background: #fff; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(255,255,255,0.5); z-index: 5;
+        }
+        .vision-cone {
+            position: absolute; top: 0; left: -150px;
+            width: 300px; height: 300px;
+            background: linear-gradient(to bottom, rgba(255, 255, 0, 0.3) 0%, transparent 80%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            pointer-events: none; z-index: 1;
+        }
+        .thief-dot {
+            position: absolute; width: 20px; height: 20px; background: var(--primary);
+            border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px var(--primary); border: 2px solid #fff; z-index: 10;
+        }
+        .vision-area.alert .vision-cone { background: linear-gradient(to bottom, rgba(255, 0, 0, 0.5) 0%, transparent 80%); }
+        .vision-area.alert .guard-body { background: #ff0000; box-shadow: 0 0 30px #f00; }
+
+        /* --- 3. FSM --- */
+        .fsm-area {
+            width: 100%; height: 400px; background: #080808;
+            border: 2px solid #333; border-radius: 10px 10px 0 0; position: relative;
+            overflow: hidden; cursor: none;
+        }
+        .fsm-panel {
+            background: #111; border: 2px solid #333; border-top: none;
+            border-radius: 0 0 10px 10px; padding: 15px; display: flex; justify-content: space-around;
+            font-family: 'Courier New', monospace; font-size: 1rem; color: #888;
+        }
+        .fsm-val { color: #fff; font-weight: bold; margin-left: 5px; }
+
+        .player-cursor {
+            position: absolute; width: 25px; height: 25px;
+            background: #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none;
+            box-shadow: 0 0 20px #fff; z-index: 5;
+        }
+        .enemy-unit {
+            position: absolute; width: 50px; height: 50px;
+            background: #444; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2; display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; transition: border-color 0.2s; border: 3px solid #666;
+        }
+        .patrol-marker {
+            position: absolute; width: 15px; height: 15px;
+            border: 2px dashed #0f0; border-radius: 50%;
+            transform: translate(-50%, -50%); opacity: 0.7; pointer-events: none;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+        .sight-line {
+            position: absolute; height: 2px; transform-origin: 0 50%;
+            background: #444; z-index: 1; pointer-events: none;
+        }
+        .fsm-area.patrol .enemy-unit { border-color: #0f0; box-shadow: 0 0 15px #0f0; }
+        .fsm-area.chase .enemy-unit { border-color: #fa0; box-shadow: 0 0 15px #fa0; }
+        .fsm-area.attack .enemy-unit { border-color: #f00; box-shadow: 0 0 30px #f00; }
+
+        .controls-panel { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; }
+        /* Кнопки стилізовані під термінал */
+        .lab-btn { 
+            font-size: 1rem; padding: 0.8rem 2rem; border-radius: 5px; letter-spacing: 1px;
+            box-shadow: none; border: 1px solid var(--primary);
+        }
+        .lab-btn:hover { box-shadow: 0 0 15px var(--primary); }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="index.html" class="logo">AI:GAMES</a>
+        <div class="nav-links">
+            <a href="index.html">Головна</a>
+            <a href="technologies.html">Технології</a>
+            <a href="ethics.html">Виклики</a>
+            <a href="lab.html" class="active">Лабораторія</a>
+            <a href="sources.html">Джерела</a> 
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="tech-hero">
+        <h1>SIMULATION_LAB</h1>
+        <p class="hero-subtitle">Інтерактивне тестування ігрових алгоритмів.</p>
+    </section>
+
+    <div class="lab-section">
+        <h2 class="lab-title">TEST_01: NAVIGATION</h2>
+        <p class="lab-desc">Алгоритм пошуку шляху A*. Клікай для створення перешкод.</p>
+        <div class="grid-container" id="grid"></div>
+        <div class="controls-panel">
+            <button class="lab-btn" onclick="runPathfinding()">[ RUN ]</button>
+            <button class="lab-btn clear" onclick="initGrid()">[ RESET ]</button>
+        </div>
+    </div>
+
+    <div class="lab-section">
+        <h2 class="lab-title">TEST_02: STEALTH</h2>
+        <p class="lab-desc">Система виявлення гравця. Уникай конуса зору.</p>
+        <div class="vision-area" id="vision-area">
+            <div class="guard-wrapper" id="guard-wrapper">
+                <div class="vision-cone"></div>
+                <div class="guard-body"></div>
+            </div>
+            <div class="thief-dot" id="thief"></div>
+        </div>
+        <p style="text-align:center; margin-top:10px; font-family:monospace; font-size:1.2rem;">STATUS: <span id="vision-status" style="color:#0f0">HIDDEN</span></p>
+    </div>
+
+    <div class="lab-section">
+        <h2 class="lab-title">TEST_03: STATE_MACHINE</h2>
+        <p class="lab-desc">Логіка поведінки ворога. Наведи курсор для взаємодії.</p>
+        <div class="fsm-area patrol" id="fsm-area">
+            <div class="sight-line" id="sight-line"></div>
+            <div class="patrol-marker" id="patrol-marker"></div> 
+            <div class="player-cursor" id="player"></div>
+            <div class="enemy-unit" id="enemy">👾</div>
+        </div>
+        <div class="fsm-panel">
+            <div>MODE: <span id="fsm-state" class="fsm-val" style="color:#0f0">PATROL</span></div>
+            <div>ACTION: <span id="fsm-action" class="fsm-val">Scanning...</span></div>
+            <div>TARGET: <span id="fsm-target" class="fsm-val">Point A</span></div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 6rem;">
+        <p style="color: #ccc; margin-bottom: 1rem;">Де я взяла цю інформацію?</p>
+        <a href="sources.html" class="cta-button">Перейти до Джерел →</a>
+    </div>
+
+</main>
+
+<footer>
+    <div class="author-box">
+        <p>Авторка проєкту:</p>
+        <input type="text" id="author" placeholder="3КН-25б Бігун Дар'я">
+    </div>
+    <p>© 2025 • AI:GAMES</p>
+</footer>
+
+<script src="script.js"></script>
+
+<script>
+    /* 1. PATHFINDING */
+    const rows = 10; const cols = 10;
+    const gridEl = document.getElementById('grid');
+    let grid = [];
+    const startNode = {r:0, c:0}; const endNode = {r:9, c:9};
+
+    function initGrid() {
+        gridEl.innerHTML = ''; grid = [];
+        for(let r=0; r<rows; r++){
+            let row = [];
+            for(let c=0; c<cols; c++){
+                let cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                if(r===startNode.r && c===startNode.c) cell.classList.add('start');
+                if(r===endNode.r && c===endNode.c) cell.classList.add('end');
+                cell.onmousedown = () => { if(!cell.classList.contains('start') && !cell.classList.contains('end')) { cell.classList.toggle('wall'); cell.classList.remove('path'); }};
+                gridEl.appendChild(cell);
+                row.push(cell);
+            }
+            grid.push(row);
+        }
+    }
+    async function runPathfinding() {
+        grid.forEach(r => r.forEach(c => c.classList.remove('path')));
+        let queue = [ {r: startNode.r, c: startNode.c, path: []} ];
+        let visited = new Set([`0,0`]);
+        while(queue.length > 0) {
+            let {r, c, path} = queue.shift();
+            if(r === endNode.r && c === endNode.c) {
+                for(let p of path) {
+                    if(!(p.r === startNode.r && p.c === startNode.c)) {
+                        grid[p.r][p.c].classList.add('path');
+                        await new Promise(res => setTimeout(res, 50));
+                    }
+                }
+                return;
+            }
+            [[0,1], [0,-1], [1,0], [-1,0]].forEach(([dr, dc]) => {
+                let nr = r+dr, nc = c+dc;
+                if(nr>=0 && nr<rows && nc>=0 && nc<cols && !grid[nr][nc].classList.contains('wall') && !visited.has(`${nr},${nc}`)) {
+                    visited.add(`${nr},${nc}`);
+                    queue.push({ r: nr, c: nc, path: [...path, {r: nr, c: nc}] });
+                }
+            });
+        }
+    }
+    initGrid();
+
+    /* 2. STEALTH */
+    const guardWrap = document.getElementById('guard-wrapper');
+    const thiefEl = document.getElementById('thief');
+    const statusText = document.getElementById('vision-status');
+    const visionBox = document.getElementById('vision-area');
+    let guardAngle = 0; let targetAngle = 0; let isLooking = false; let tX = 50, tY = 50;
+
+    function guardLoop() {
+        if(!isLooking) {
+            let diff = targetAngle - guardAngle;
+            if(Math.abs(diff) < 2) {
+                isLooking = true;
+                setTimeout(() => { targetAngle = Math.random() * 360; isLooking = false; }, 1000);
+            } else { guardAngle += diff * 0.05; }
+        }
+        guardWrap.style.transform = `translate(-50%, -50%) rotate(${guardAngle - 90}deg)`;
+        checkStealth();
+        requestAnimationFrame(guardLoop);
+    }
+    requestAnimationFrame(guardLoop);
+
+    visionBox.addEventListener('mousemove', (e) => {
+        const rect = visionBox.getBoundingClientRect();
+        tX = e.clientX - rect.left; tY = e.clientY - rect.top;
+        thiefEl.style.left = tX + 'px'; thiefEl.style.top = tY + 'px';
+    });
+
+    function checkStealth() {
+        const rect = visionBox.getBoundingClientRect();
+        const cx = rect.width/2; const cy = rect.height/2;
+        const dx = tX - cx; const dy = tY - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        let angleToPlayer = Math.atan2(dy, dx) * (180/Math.PI);
+        let gA = (guardAngle % 360 + 360) % 360;
+        let pA = (angleToPlayer % 360 + 360) % 360;
+        let diff = Math.abs(gA - pA);
+        if(diff > 180) diff = 360 - diff;
+        if(dist < 280 && diff < 30) {
+            visionBox.classList.add('alert'); statusText.innerText = "DETECTED!"; statusText.style.color = "#f00";
+        } else {
+            visionBox.classList.remove('alert'); statusText.innerText = "HIDDEN"; statusText.style.color = "#0f0";
+        }
+    }
+
+    /* 3. FSM */
+    const fsmBox = document.getElementById('fsm-area');
+    const pl = document.getElementById('player'); const en = document.getElementById('enemy');
+    const sl = document.getElementById('sight-line'); const pm = document.getElementById('patrol-marker');
+    const lbState = document.getElementById('fsm-state'); const lbAction = document.getElementById('fsm-action'); const lbTarget = document.getElementById('fsm-target');
+    let pX = 50, pY = 50; let eX = 200, eY = 200; let patrolPoint = {x:300, y:100};
+
+    fsmBox.addEventListener('mousemove', (e) => {
+        const r = fsmBox.getBoundingClientRect();
+        pX = e.clientX - r.left; pY = e.clientY - r.top;
+        pl.style.left = pX + 'px'; pl.style.top = pY + 'px';
+    });
+
+    function fsmLoop() {
+        pm.style.left = patrolPoint.x + 'px'; pm.style.top = patrolPoint.y + 'px';
+        let dx = pX - eX; let dy = pY - eY;
+        let dist = Math.sqrt(dx*dx + dy*dy);
+        let angle = Math.atan2(dy, dx);
+        sl.style.width = dist + 'px'; sl.style.left = eX + 'px'; sl.style.top = eY + 'px'; sl.style.transform = `rotate(${angle}rad)`;
+        fsmBox.classList.remove('patrol', 'chase', 'attack');
+
+        if(dist < 60) {
+            fsmBox.classList.add('attack'); lbState.innerText = "ATTACK"; lbState.style.color = "#f00"; lbAction.innerText = "Eliminating..."; lbTarget.innerText = "PLAYER";
+        } else if(dist < 200) {
+            fsmBox.classList.add('chase'); lbState.innerText = "CHASE"; lbState.style.color = "#fa0"; lbAction.innerText = "Pursuing..."; lbTarget.innerText = "PLAYER";
+            eX += Math.cos(angle) * 2.5; eY += Math.sin(angle) * 2.5;
+        } else {
+            fsmBox.classList.add('patrol'); lbState.innerText = "PATROL"; lbState.style.color = "#0f0"; lbAction.innerText = "Scanning..."; lbTarget.innerText = "WAYPOINT";
+            let tdx = patrolPoint.x - eX; let tdy = patrolPoint.y - eY;
+            if(Math.sqrt(tdx*tdx + tdy*tdy) < 5) {
+                patrolPoint.x = Math.random() * (fsmBox.clientWidth - 40) + 20; patrolPoint.y = Math.random() * (fsmBox.clientHeight - 40) + 20;
+            } else {
+                let angT = Math.atan2(tdy, tdx); eX += Math.cos(angT) * 1.5; eY += Math.sin(angT) * 1.5;
+            }
+        }
+        en.style.left = eX + 'px'; en.style.top = eY + 'px';
+        requestAnimationFrame(fsmLoop);
+    }
+    fsmLoop();
+</script>
+</body>
+</html>

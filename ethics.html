@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Етичні Виклики ШІ</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ethics-hero h1 { color: #ff4444; text-shadow: 0 0 20px #ff0000; }
+        .ethics-hero p { color: #ffaaaa; }
+        
+        .error-grid {
+            display: grid; gap: 2rem; max-width: 1000px;
+            margin: 4rem auto; padding: 0 2rem;
+        }
+
+        .error-card {
+            background: rgba(30, 10, 10, 0.8);
+            border-left: 4px solid #ff4444;
+            padding: 2rem; position: relative; transition: 0.3s;
+            overflow: hidden;
+        }
+        
+        .error-card::before {
+            content: 'WARNING'; position: absolute; top: 10px; right: 10px;
+            font-size: 0.8rem; color: #ff4444; letter-spacing: 2px;
+            border: 1px solid #ff4444; padding: 2px 5px; opacity: 0.7;
+        }
+
+        .error-card:hover {
+            background: rgba(50, 10, 10, 0.9);
+            box-shadow: -10px 0 20px rgba(255, 0, 0, 0.2);
+            transform: translateX(10px);
+        }
+
+        .error-card h2 { color: #fff; margin-bottom: 1rem; display: flex; align-items: center; }
+        .error-card h2 span { margin-right: 10px; color: #ff4444; }
+        .error-card p { color: #ccc; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="index.html" class="logo">AI:GAMES</a>
+        <div class="nav-links">
+            <a href="index.html">Головна</a>
+            <a href="technologies.html">Технології</a>
+            <a href="ethics.html" class="active">Виклики</a>
+            <a href="lab.html">Лабораторія</a>
+            <a href="sources.html">Джерела</a> 
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="ethics-hero" style="text-align:center; padding-top:120px;">
+        <h1>SYSTEM_ERROR: ETHICS</h1>
+        <p class="hero-subtitle">Ціна, яку ми платимо за живий світ.</p>
+    </section>
+
+    <section class="error-grid">
+        
+        <div class="error-card">
+            <h2><span>⚠️</span> Смерть Автора?</h2>
+            <p>Якщо діалоги генерує ШІ, куди зникає роль сценариста? Чи зможе нейромережа створити глибину сюжету рівня The Witcher 3, чи ми отримаємо безкінечні, але пусті розмови без душі?</p>
+        </div>
+
+        <div class="error-card">
+            <h2><span>🆔</span> Крадіжка Голосу</h2>
+            <p>Технологія Voice Cloning дозволяє NPC говорити голосом будь-якого актора. Але чи давав актор на це згоду? Це відкриває шлях до масових судових позовів і етичних скандалів.</p>
+        </div>
+
+        <div class="error-card">
+            <h2><span>🤬</span> Токсичність та Цензура</h2>
+            <p>Генеративний ШІ непередбачуваний. Що робити розробникам, якщо милий NPC-торговець раптом почне використовувати нецензурну лексику або пропагувати ненависть через "злом" промпту гравцем?</p>
+        </div>
+
+        <div class="error-card">
+            <h2><span>💔</span> Емоційна Маніпуляція</h2>
+            <p>Люди вже закохуються в чат-ботів. Коли ігрові персонажі стануть невідрізнені від людей і будуть пам'ятати кожне твоє слово, чи етично дозволяти розробникам маніпулювати емоціями гравців заради утримання в грі?</p>
+        </div>
+
+    </section>
+
+    <div style="text-align: center; margin-bottom: 6rem;">
+        <p style="color: #ccc; margin-bottom: 1rem;">Час перевірити теорію на практиці.</p>
+        <a href="lab.html" class="cta-button" style="background: #ff4444; box-shadow: 0 0 30px #ff4444;">Відкрити Лабораторію →</a>
+    </div>
+
+</main>
+
+<footer>
+    <div class="author-box">
+        <p>Авторка проєкту:</p>
+        <input type="text" id="author" placeholder="3КН-25б Бігун Дар'я">
+    </div>
+    <p>© 2025 • AI:GAMES</p>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
